@@ -1,71 +1,67 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.26;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract MyToken is ERC20, Ownable {
-    constructor() ERC20("Avni", "AC") {
-        // Initialize predefined items in the constructor
-        _addPredefinedItem(1, "Item 1", 100);
-        _addPredefinedItem(2, "Item 2", 200);
-        _addPredefinedItem(3, "Item 3", 300);
-    }
 
-    // Item struct to hold item details
+contract MyERC20 is ERC20, Ownable(msg.sender) {
+
     struct Item {
-        string name;
-        uint256 price; // Price in tokens to redeem the item
+        uint itemId;
+        string itemName;
+        uint itemPrice;
     }
 
-    // Mapping to store predefined items
-    mapping(uint256 => Item) public items;
+    mapping(uint => Item) public items;
+    uint public itemCount;
 
-    // Mapping to keep track of redeemed items for each user
-    mapping(address => mapping(uint256 => bool)) public redeemedItems;
+    // Mapping to track redeemed items for each user
+    mapping(address => mapping(uint => bool)) public redeemedItems;
 
-    // Event emitted when an item is redeemed
-    event ItemRedeemed(address indexed account, uint256 indexed itemId);
+    // Event to log item redemption
+    event ItemRedeemed(address indexed user, uint indexed itemId, string itemName, uint itemPrice);
 
-    // Function to add a predefined item (can only be called by the contract owner)
-    function _addPredefinedItem(uint256 itemId, string memory name, uint256 price) private onlyOwner {
-        items[itemId] = Item(name, price);
+    constructor() ERC20("Degen", "DGN") {
+        transferOwnership(msg.sender);
     }
 
-    // Function to redeem a predefined item with the given itemId
-    function redeemItem(uint256 itemId) public {
-        Item memory item = items[itemId];
-        require(item.price > 0, "Item not found"); // Check if the item exists
-        require(balanceOf(msg.sender) >= item.price, "Insufficient balance"); // Check if the user has enough tokens
-        require(!redeemedItems[msg.sender][itemId], "Item already redeemed"); // Check if the item is not already redeemed
-
-        _burn(msg.sender, item.price); // Burn the required amount of tokens
-        redeemedItems[msg.sender][itemId] = true; // Mark the item as redeemed for the user
-        emit ItemRedeemed(msg.sender, itemId); // Emit the ItemRedeemed event
+    function mint(address receiver, uint amount) external onlyOwner {
+        _mint(receiver, amount);
     }
 
-    // Function to get the details of a stored item by its itemId
-    function getItemDetails(uint256 itemId) public view returns (string memory name, uint256 price) {
-        Item memory item = items[itemId];
-        require(item.price > 0, "Item not found"); // Check if the item exists
-        return (item.name, item.price);
-    }
-
-    function mint(address to, uint256 amount) public onlyOwner {
-        _mint(to, amount);
-    }
-
-    function burn(uint256 amount) public {
+    function burn(uint amount) external {
+        require(amount > 0, "Amount should not be zero");
         _burn(msg.sender, amount);
     }
 
-    function transfer(address to, uint256 amount) public override returns (bool) {
-        require(amount <= balanceOf(msg.sender), "Insufficient balance");
-        return super.transfer(to, amount);
+    function addItem(string memory itemName, uint itemPrice) external onlyOwner {
+        itemCount++;
+        Item memory newItem = Item(itemCount, itemName, itemPrice);
+        items[itemCount] = newItem;
     }
 
-    // New function to get the token balance of an address
-    function getMyTokenBalance(address account) public view returns (uint256) {
-        return balanceOf(account);
+    function getItems() external view returns (Item[] memory) {
+        Item[] memory allItems = new Item[](itemCount);
+
+        for (uint i = 1; i <= itemCount; i++) {
+            allItems[i - 1] = items[i];
+        }
+
+        return allItems;
     }
+
+    function redeem(uint itemId) external {
+    require(itemId > 0 && itemId <= itemCount, "Invalid item ID");
+    Item memory redeemedItem = items[itemId];
+
+    require(balanceOf(msg.sender) >= redeemedItem.itemPrice, "Insufficient Balance to redeem");
+    require(!redeemedItems[msg.sender][itemId], "Item already redeemed");
+
+    // Transfer the item price to the owner
+    _transfer(msg.sender, owner(), redeemedItem.itemPrice);
+    redeemedItems[msg.sender][itemId] = true;
+
+    emit ItemRedeemed(msg.sender, itemId, redeemedItem.itemName, redeemedItem.itemPrice);
+}
 }
