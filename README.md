@@ -1,67 +1,44 @@
-# MyToken
-
-MyToken is a Solidity smart contract that implements an ERC20 token.
-
-## Description
-
-MyToken is a Solidity smart contract that implements an ERC20 token called MyToken (symbol: AC). The contract provides basic functionalities for minting, transferring, and burning tokens, with ownership control for minting and an external function to check balances.
-
-## Features
-
-Minting: The contract owner can mint new tokens and assign them to a specified recipient address.
-
-Transferring: Token holders can transfer  tokens to other addresses while ensuring the transfer amount is greater than zero.
-
-Burning: Token holders can burn a specific amount of tokens to reduce their balance.
-
-Balance Checking: An external function allows anyone to check the token balance of a specific account.
-
-## Getting Started
-
-### Installing
-
-To run the contract, follow these steps:
-
-1. Install the project dependencies by running the following command:
-
-   ```bash
-   npm i
-   ```
-
-2. Install 'hardhat' by running the command:
-   
-   ```bash
-   npm install --save-dev hardhat
-   ```
-
-3. Install OpenZeppelin:
-
-   ```bash
-    npm install @openzeppelin/contracts
-    ```
+# Eth-intermediate-module-4
+Aim of the Project
+Create an ERC20 token and deploy it on the Avalanche network for Degen Gaming. It consists of minting, burning, transferring, redeeming tokens, and checking the account balance.
 
 
-4. Deploy the DegenToken smart contract to Fuji (C-Chain) Network by running the deployment script:
+Logic of the code
 
-     ```bash
-     npx hardhat run scripts/deploy.js --network fuji
-      ```
+1. Write the license identifier and solidity version.
 
-### Executing program
+2. Import the open Zeppelin contracts and hardhat/console.sol dependencies.
 
-* Go to [remix](remix.ethereum.org) IDE.
-* Paste the contract in the IDE.
-* Compile the contract.
-* Select the `Injected Provider - Metamask` as the environment in Deploy tab.
-* Paste you contract address in remix and click on `Deploy`.
-* Interact with your contract in remix!!
+3. Create a contract named as DegenToken which is Ownable and ERC20Burnable.
 
-## Authors
+4. It consists of a constructor which defines the name and symbol of the token as "Degen Token" and "DGN " respectively.
 
-Ananya Sharma
+5. The function mint_tokens consists of minting a specific amount to a particular address. It is declared public so that it can be accessed outside the contract.
 
-[Ananya@02](https://academy.metacrafters.io/profile)
+6. The transfer_Token function takes the receiver's address and amount to be transferred as its parameters. It has a require statement that confirms that the balance of the sender should be greater than or equal to the amount to be transferred else the string message is returned. If the condition returns to true, then the approve  and transferFrom  function transfers the tokens(amount) from the sender to the receiver.
 
-## License
+7. The getBalance function is declared external and returns the unsigned int value of the valance in the sender's account/address.
 
-This code is released under the MIT License. Feel free to use, modify, and distribute it as per the terms of the license.
+8. The burn_Tokens take the unsigned int value of the amount as its parameter. It is declared as external. The require statement checks that the balance of the sender should be greater than or equal to the amount to be transferred else the string message is returned. If the condition returns to the true, then the burn function burns the specific amount of tokens from the sender's account.
+
+9. The redeem_Tokens is declared public and pure. It returns the five rewards(strings) which will be redeemed if the conditions are satisfied.
+
+10. The user enters a particular number. The require statement checks that the entered number should be less than the total number of the choices provided, if yes then the condition matching with the choice is executed and that particular numbered reward is redeemed by paying the listed tokens.
+
+Functionality of the code
+
+1. Open the Remix IDE(https://remix.ethereum.org) and clone the repository provided in the module.
+
+2. Open the contacts folder and write the above code.
+
+3. Compile the DegenToken.sol contract.
+
+4. In the deploy section, select Injected Provider environment which will help us to connect with the metamask.
+
+5. Paste the address of the account currently running in the meta mask in the At Address section.
+
+6. Open the deployed contract. Run different functions of minting, burning, transferring, redeeming tokens, and checking the account balance.
+
+7. Verify the transactions by pasting the same address in the Snowtrace Testnet site.(https://testnet.snowtrace.io)
+
+8. If all the tests are passed, then the contract has successfully followed every requirement of the project.
