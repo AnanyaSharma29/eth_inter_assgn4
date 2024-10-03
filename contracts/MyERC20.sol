@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 
-contract MyERC20 is ERC20, Ownable(msg.sender) {
+contract MyERC20 is ERC20, Ownable() {
 
     struct Item {
         uint itemId;
